@@ -1,5 +1,6 @@
 package com.example.gestionrdv.RDVREST;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,15 +15,16 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CoiffureDTO {
+public class ClientDTO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int Id_coiffure;
-    private String nom_coiffure;
+    @JsonProperty("id_client")
+    private int id_client;
 
-    public CoiffureDTO(int Id_coiffure) {
-        this.Id_coiffure = Id_coiffure;
+    @JsonProperty("nom_client")
+    private String nom_client;
+
+    public ClientDTO(int id_client) {
+        this.id_client = id_client;
     }
-
-
 }

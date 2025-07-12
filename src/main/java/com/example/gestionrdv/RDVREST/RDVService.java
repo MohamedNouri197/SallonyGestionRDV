@@ -19,6 +19,13 @@ public class RDVService implements IRDV {
    @Autowired
     private  AvailableDateHourRepository availableDateHourRepository;
 
+   @Autowired
+   private ClientDTORepository clientDTORepository;
+
+   @Autowired
+   private CoiffureDTORepository coiffureDTORepository;
+
+
 
 
 
@@ -73,6 +80,12 @@ public class RDVService implements IRDV {
       List<DateHour>  dateHour= (List<DateHour>) dateHourRepository.findById(id_date_hour).get();
       availableDateHour.setListDateHours(dateHour);
         availableDateHourRepository.save(availableDateHour);
+    }
+
+    public void addClient( ClientDTO nom_client){
+        ClientDTO client = new ClientDTO();
+        client.setNom_client(nom_client.getNom_client());
+        clientDTORepository.save(client);
     }
 
 }

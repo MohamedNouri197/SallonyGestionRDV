@@ -1,5 +1,6 @@
 package com.example.gestionrdv.RDVREST;
 
+import jakarta.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,14 @@ public class RDVRestController {
 
     @Autowired
     private AvailableDateHourRepository availableDateHourRepository;
+
+
+    @Autowired
+    private ServiceDTORepository serviceDTORepository;
+
+    @Autowired
+    private ClientDTORepository clientDTORepository;
+
 
 
     private String title = "Hello from RDV2AL6";
@@ -47,12 +56,27 @@ public class RDVRestController {
     }
 
 
-    @PostMapping
-    public ResponseEntity<RDV> createRDV(@RequestBody RDV RDV) {
-        RDV created = RDVService.saveRDV(RDV);
+    @PostMapping("/createRDV/{id_client}/{id_coiffure}/{id_service}")
+    public ResponseEntity<RDV> createRDV(
+
+            @PathVariable("id_client") int id_client,
+            @PathVariable("id_coiffure") int id_coiffure,
+            @PathVariable("id_service") int id_service) {
+          RDV rdv = new RDV();
+        ClientDTO client = clientDTORepository.findById(id_client)
+                .orElseThrow(() -> new IllegalArgumentException("Client with ID " + id_client + " not found"));
+        CoiffureDTO coiffeur = coiffureDTORepository.findById(id_coiffure)
+                .orElseThrow(() -> new IllegalArgumentException("Coiffeur with ID " + id_coiffure + " not found"));
+        ServiceDTO service = serviceDTORepository.findById(id_service)
+                .orElseThrow(() -> new IllegalArgumentException("Service with ID " + id_service + " not found"));
+
+        rdv.setClient(client);
+        rdv.setCoiffeur(coiffeur);
+        rdv.setService(service);
+
+        RDV created = RDVService.saveRDV(rdv);
         return ResponseEntity.status(201).body(created);
     }
-
     @PutMapping
     public RDV updateRDV(@RequestBody RDV RDV) {
         return RDVService.updateRDV(RDV);
@@ -95,6 +119,27 @@ public class RDVRestController {
         List<AvailableDateHour> availableDateHours = availableDateHourRepository.findAll();
         return ResponseEntity.ok(availableDateHours);
     }
+    @PostMapping("/addClient")
+    public ResponseEntity<String> addClient( @RequestBody ClientDTO nom_client) {
+        try {
+            RDVService.addClient( nom_client);
+            return ResponseEntity.ok("Client ajouté avec succès");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    @PostMapping("/addService")
+
+    public  ResponseEntity<String> addService(@RequestBody ServiceDTO serviceDTO) {
+        try {
+            serviceDTORepository.save(serviceDTO);
+            return ResponseEntity.ok("Service ajouté avec succès");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
 }
 
 
